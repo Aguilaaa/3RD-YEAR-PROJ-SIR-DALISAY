@@ -1,0 +1,12 @@
+{
+  "name": "mototech",
+  "private": true,
+  "scripts": {
+    "dev": "npx concurrently -n api,web -c orange,cyan \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "seed": "npm run seed --prefix server",
+    "make-admin": "npm run make-admin --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
