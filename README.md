@@ -2,17 +2,19 @@
 
 Motorcycle parts and accessories shop for ITCP318. The storefront uses React, Bootstrap, and custom CSS. The admin area uses Material UI. The API uses Express and MongoDB. Photos go to Cloudinary, login uses Firebase Authentication, and order updates send an email with a PDF receipt.
 
+The project follows the class layout: `backend` for the API and `frontend` for the React app.
+
 ## Run it
 
 1. Install [MongoDB Community](https://www.mongodb.com/try/download/community) or use an Atlas connection string.
-2. Copy `server/.env.example` to `server/.env` and `client/.env.example` to `client/.env`.
+2. Copy `backend/config/.env.example` to `backend/config/.env` and `frontend/.env.example` to `frontend/.env`.
 3. Fill in MongoDB, Cloudinary, Firebase, and SMTP values. Set `ADMIN_EMAIL` to the email you will register as the administrator.
 4. From this folder:
 
 ```bash
 npm install
-npm install --prefix server
-npm install --prefix client
+npm install --prefix backend
+npm install --prefix frontend
 npm run dev
 ```
 

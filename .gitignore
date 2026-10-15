@@ -1,7 +1,19 @@
 node_modules/
+/frontend/node_modules
+/backend/node_modules
 dist/
+/build
+
+# env
+/backend/config/.env
+frontend/.env
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 *.log
+npm-debug.log*
 .DS_Store
-server/uploads/
+backend/uploads/
