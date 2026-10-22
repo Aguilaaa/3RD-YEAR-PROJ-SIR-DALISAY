@@ -201,6 +201,11 @@ const listPublic = asyncHandler(async (req, res) => {
   else if (req.query.rating === '4') pipeline.push({ $match: { averageRating: { $gte: 4 } } });
   else if (req.query.rating === '3') pipeline.push({ $match: { averageRating: { $gte: 3 } } });
 
+  const reviews = String(req.query.reviews || req.query.review || '');
+  if (reviews === 'with') pipeline.push({ $match: { ratingCount: { $gte: 1 } } });
+  else if (reviews === 'without') pipeline.push({ $match: { ratingCount: 0 } });
+  else if (reviews === '5') pipeline.push({ $match: { ratingCount: { $gte: 5 } } });
+
   pipeline.push({ $sort: { createdAt: -1 } });
   pipeline.push({
     $facet: {
@@ -326,7 +331,6 @@ const getOne = asyncHandler(async (req, res) => {
       comment: review.comment,
       createdAt: review.createdAt,
       updatedAt: review.updatedAt,
-      verifiedPurchase: true,
       author: publicAuthor(review.user),
       mine: req.user ? String(review.user?._id || review.user) === String(req.user._id) : false,
     })),
@@ -467,31 +471,6 @@ async function findOwnedImage(productId, imageId) {
   return image;
 }
 
-const addImages = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  if (!product || isDeleted(product)) throw new AppError('That product was not found.', 404);
-  if (!req.files?.length) throw new AppError('Choose at least one photo.', 400);
-
-  const existingCount = await ProductImage.countDocuments({ product: product._id });
-  if (existingCount + req.files.length > MAX_IMAGES) {
-    throw new AppError('A product can have at most 8 photos.', 400);
-  }
-
-  const uploaded = await uploadProductFiles(req.files);
-  const hasPrimary = await ProductImage.exists({ product: product._id, isPrimary: true });
-  await ProductImage.insertMany(
-    uploaded.map((image, index) => ({
-      product: product._id,
-      url: image.url,
-      publicId: image.publicId,
-      isPrimary: !hasPrimary && index === 0,
-    }))
-  );
-
-  const saved = await Product.findById(product._id).populate('category');
-  res.json({ product: await shapeAdminProduct(saved) });
-});
-
 const replaceImage = asyncHandler(async (req, res) => {
   const image = await findOwnedImage(req.params.id, req.params.imageId);
   if (!req.file) throw new AppError('Choose a replacement photo.', 400);
@@ -556,7 +535,6 @@ module.exports = {
   remove,
   bulkDelete,
   restore,
-  addImages,
   replaceImage,
   deleteImage,
   setPrimary,

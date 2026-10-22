@@ -51,10 +51,10 @@ export const SAMPLE_PRODUCTS = ROWS.map(([itemCode, name, categoryName, motorcyc
   models: models(compatible),
   imageUrl: '',
   averageRating: 0,
+  ratingCount: 0,
 }));
 
-export function filterSamples(products, { search = '', categoryName = '', price = '', rating = '', modelId = '', models = [] }) {
-  if (rating) return [];
+export function filterSamples(products, { search = '', categoryName = '', price = '', rating = '', reviews = '', modelId = '', models = [] }) {
   const selected = models.find((model) => model.id === modelId);
   const words = search.trim().toLowerCase();
 
@@ -68,6 +68,12 @@ export function filterSamples(products, { search = '', categoryName = '', price 
     if (price === '500-1000' && !(product.price >= 500 && product.price <= 1000)) return false;
     if (price === '1000-5000' && !(product.price > 1000 && product.price <= 5000)) return false;
     if (price === 'above-5000' && !(product.price > 5000)) return false;
+    if (rating === '5' && product.averageRating !== 5) return false;
+    if (rating === '4' && product.averageRating < 4) return false;
+    if (rating === '3' && product.averageRating < 3) return false;
+    if (reviews === 'with' && !(product.ratingCount > 0)) return false;
+    if (reviews === 'without' && product.ratingCount > 0) return false;
+    if (reviews === '5' && product.ratingCount < 5) return false;
     if (selected) {
       const label = `${selected.brand} ${selected.name}`;
       if (!product.models.some((model) => `${model.brand} ${model.name}` === label)) return false;

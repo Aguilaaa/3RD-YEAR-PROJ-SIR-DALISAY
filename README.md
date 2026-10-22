@@ -43,12 +43,12 @@ Google sign-in always creates a customer. Sample categories, motorcycle models, 
 | Area | Where it lives |
 | --- | --- |
 | MP1 product CRUD, Cloudinary photos, DataTables, bulk delete | Admin → Products |
-| MP2 registration, Firebase login, profile photo | Register, Login, Profile |
+| MP2 price, category, rating, and review filters | Shop homepage |
 | MP3 reviews and ratings | Product page and Admin → Reviews |
 | Bad-word masking | Review save, `bad-words` on the server |
 | Form validation | Yup with Formik on registration and React Hook Form everywhere else |
 | Cart, checkout, status email, PDF receipt | Cart, Checkout, Admin → Orders |
-| Price, category, and rating filters | Shop homepage |
+| Registration, Firebase login, profile photo | Register, Login, Profile |
 | Monthly line chart and date-range bar chart | Admin → Dashboard and Sales |
-| Pagination and infinite scroll | Shop homepage toggle |
+| Infinite scroll on the product list | Shop homepage |
 | Google login | Login and Register, Firebase Authentication |

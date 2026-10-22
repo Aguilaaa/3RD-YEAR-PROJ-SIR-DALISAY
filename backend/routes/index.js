@@ -29,7 +29,6 @@ router.post('/products', requireAuth, requireAdmin, productPhotos, products.crea
 router.put('/products/:id', requireAuth, requireAdmin, productPhotos, products.update);
 router.delete('/products/:id', requireAuth, requireAdmin, products.remove);
 router.patch('/products/:id/restore', requireAuth, requireAdmin, products.restore);
-router.post('/products/:id/images', requireAuth, requireAdmin, productPhotos, products.addImages);
 router.put('/products/:id/images/:imageId', requireAuth, requireAdmin, singleProductPhoto, products.replaceImage);
 router.delete('/products/:id/images/:imageId', requireAuth, requireAdmin, products.deleteImage);
 router.patch('/products/:id/images/:imageId/primary', requireAuth, requireAdmin, products.setPrimary);
@@ -37,7 +36,6 @@ router.post('/products/:id/reviews', requireAuth, reviews.createReview);
 
 router.put('/reviews/:id', requireAuth, reviews.updateReview);
 
-router.get('/users/me', requireAuth, auth.me);
 router.put('/users/me', requireAuth, profilePhoto, users.updateProfile);
 
 router.get('/cart', requireAuth, cart.getCart);

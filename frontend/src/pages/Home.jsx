@@ -4,11 +4,10 @@ import api from '../api/client';
 import { ProductCard } from '../components/ProductCard';
 import { SAMPLE_PRODUCTS, filterSamples } from '../catalogPhotos';
 import { CATEGORY_TILES, GROUP_TO_CATEGORY } from '../storefront';
-import { PRICE_OPTIONS, RATING_OPTIONS } from '../utils/format';
+import { PRICE_OPTIONS, RATING_OPTIONS, REVIEW_OPTIONS } from '../utils/format';
 
 export function Home() {
   const [params, setParams] = useSearchParams();
-  const [mode, setMode] = useState('pages');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(SAMPLE_PRODUCTS.length);
@@ -21,8 +20,7 @@ export function Home() {
   const appendRef = useRef(false);
   const loadingRef = useRef(false);
   const sentinelRef = useRef(null);
-  const modeRef = useRef(mode);
-  const filterKey = `${params.get('group') || ''}|${params.get('model') || ''}|${params.get('price') || ''}|${params.get('rating') || ''}|${params.get('search') || ''}`;
+  const filterKey = `${params.get('group') || ''}|${params.get('model') || ''}|${params.get('price') || ''}|${params.get('rating') || ''}|${params.get('reviews') || ''}|${params.get('search') || ''}`;
   const filterKeyRef = useRef(filterKey);
 
   useEffect(() => {
@@ -45,16 +43,9 @@ export function Home() {
       }
     }
 
-    if (group && categories.length === 0) return undefined;
+    if (group && !categoryId && categories.length === 0) return undefined;
 
     let ignore = false;
-    const modeChanged = modeRef.current !== mode;
-    modeRef.current = mode;
-    if (modeChanged && page !== 1) {
-      appendRef.current = false;
-      setPage(1);
-      return undefined;
-    }
 
     function showSamples() {
       const visible = filterSamples(SAMPLE_PRODUCTS, {
@@ -62,6 +53,7 @@ export function Home() {
         categoryName,
         price: params.get('price') || '',
         rating: params.get('rating') || '',
+        reviews: params.get('reviews') || '',
         modelId: params.get('model') || '',
         models,
       });
@@ -85,6 +77,7 @@ export function Home() {
             category: categoryId,
             price: params.get('price') || '',
             rating: params.get('rating') || '',
+            reviews: params.get('reviews') || '',
             model: params.get('model') || '',
             page,
             limit: 8,
@@ -94,9 +87,13 @@ export function Home() {
         liveRef.current = true;
         setPages(data.pages);
         setTotal(data.total);
-        setProducts((current) => (appendRef.current ? [...current, ...data.products] : data.products));
+        setProducts((current) => {
+          if (page <= 1) return data.products;
+          const seen = new Set(current.map((item) => String(item.id)));
+          return [...current, ...data.products.filter((item) => !seen.has(String(item.id)))];
+        });
         appendRef.current = false;
-        if (mode === 'scroll' && page < data.pages) {
+        if (page < data.pages) {
           requestAnimationFrame(() => {
             const node = sentinelRef.current;
             if (!node || ignore || loadingRef.current || appendRef.current) return;
@@ -121,10 +118,9 @@ export function Home() {
     return () => {
       ignore = true;
     };
-  }, [filterKey, page, mode, categoryId, group, categories.length]);
+  }, [filterKey, page, categoryId, group, categories.length]);
 
   useEffect(() => {
-    if (mode !== 'scroll') return undefined;
     const node = sentinelRef.current;
     if (!node) return undefined;
     const observer = new IntersectionObserver((entries) => {
@@ -135,7 +131,7 @@ export function Home() {
     }, { rootMargin: '240px' });
     observer.observe(node);
     return () => observer.disconnect();
-  }, [mode, page, pages, products.length]);
+  }, [page, pages, products.length]);
 
   function updateParams(partial) {
     const next = new URLSearchParams(params);
@@ -144,11 +140,6 @@ export function Home() {
       else next.delete(key);
     });
     setParams(next);
-  }
-
-  function changeMode(next) {
-    appendRef.current = false;
-    setMode(next);
   }
 
   return (
@@ -240,10 +231,12 @@ export function Home() {
                 {RATING_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
             </label>
-            <div className="mode-toggle btn-group" role="group" aria-label="Product list mode">
-              <button type="button" className={`btn ${mode === 'pages' ? 'active' : ''}`} onClick={() => changeMode('pages')}>Pages</button>
-              <button type="button" className={`btn ${mode === 'scroll' ? 'active' : ''}`} onClick={() => changeMode('scroll')}>Infinite scroll</button>
-            </div>
+            <label>
+              Reviews
+              <select value={params.get('reviews') || ''} onChange={(event) => updateParams({ reviews: event.target.value })}>
+                {REVIEW_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+            </label>
           </form>
 
           {error && <div className="alert alert-danger">{error}</div>}
@@ -256,29 +249,9 @@ export function Home() {
             <div className="alert alert-secondary mt-3">No parts match that bike and those filters.</div>
           )}
           {loading && products.length === 0 && <p className="catalog-loading">Loading parts…</p>}
-
-          {mode === 'pages' && pages > 1 && (
-            <nav className="mt-4" aria-label="Product pages">
-              <ul className="pagination">
-                {Array.from({ length: pages }, (_, index) => (
-                  <li className={`page-item ${page === index + 1 ? 'active' : ''}`} key={index}>
-                    <button
-                      className="page-link"
-                      type="button"
-                      onClick={() => {
-                        appendRef.current = false;
-                        setPage(index + 1);
-                        document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    >
-                      {index + 1}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
-          {mode === 'scroll' && <div ref={sentinelRef} className="scroll-sentinel" />}
+          {loading && products.length > 0 && <p className="catalog-loading">Loading more parts…</p>}
+          {!loading && page < pages && <p className="catalog-loading">Scroll for more parts</p>}
+          <div ref={sentinelRef} className="scroll-sentinel" />
         </div>
       </section>
     </>

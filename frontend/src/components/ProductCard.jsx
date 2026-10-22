@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { productPhoto } from '../catalogPhotos';
+import { Stars } from './Stars';
 import { peso } from '../utils/format';
 
 export function ProductCard({ product, badge }) {
@@ -23,6 +24,10 @@ export function ProductCard({ product, badge }) {
       <h2>
         <Link to={`/products/${product.id}`}>{product.name}</Link>
       </h2>
+      <p className="part-rating">
+        <Stars value={product.averageRating} />
+        <span>{product.averageRating || 0} ({product.ratingCount || 0})</span>
+      </p>
       <p className="part-price">{peso(product.price)}</p>
       <p className="part-fit">{fitCount ? `Fits ${fitCount} model${fitCount === 1 ? '' : 's'}` : product.motorcycleBrand}</p>
       <p className="part-stock">{inStock ? 'In stock' : 'On order'}</p>

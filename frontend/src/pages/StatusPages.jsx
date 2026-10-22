@@ -23,15 +23,3 @@ export function AccessDenied() {
     </div>
   );
 }
-
-export function Unauthorized() {
-  return (
-    <div className="status-page">
-      <div>
-        <h1>401</h1>
-        <p>Please log in to continue.</p>
-        <Link className="btn btn-moto" to="/login">Login</Link>
-      </div>
-    </div>
-  );
-}

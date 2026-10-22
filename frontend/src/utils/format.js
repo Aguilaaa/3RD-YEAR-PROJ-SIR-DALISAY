@@ -29,6 +29,13 @@ export const RATING_OPTIONS = [
   { value: '3', label: '3 stars & above' },
 ];
 
+export const REVIEW_OPTIONS = [
+  { value: '', label: 'Any reviews' },
+  { value: 'with', label: 'With reviews' },
+  { value: 'without', label: 'No reviews yet' },
+  { value: '5', label: '5 or more reviews' },
+];
+
 export const ORDER_STATUSES = [
   'Pending',
   'Processing',

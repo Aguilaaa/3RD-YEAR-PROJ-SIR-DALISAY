@@ -11,7 +11,7 @@ import { Cart } from './pages/Cart';
 import { Checkout } from './pages/Checkout';
 import { Orders } from './pages/Orders';
 import { OrderDetails } from './pages/OrderDetails';
-import { AccessDenied, NotFound, Unauthorized } from './pages/StatusPages';
+import { AccessDenied, NotFound } from './pages/StatusPages';
 import { Dashboard } from './pages/admin/Dashboard';
 import { Products } from './pages/admin/Products';
 import { AdminOrders } from './pages/admin/Orders';
@@ -43,7 +43,6 @@ export default function App() {
         <Route path="orders" element={<RequireAuth><Orders /></RequireAuth>} />
         <Route path="orders/:id" element={<RequireAuth><OrderDetails /></RequireAuth>} />
         <Route path="access-denied" element={<AccessDenied />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
