@@ -13,4 +13,8 @@ function formatWhen(date) {
   }).format(new Date(date));
 }
 
-module.exports = { peso, formatWhen };
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+module.exports = { peso, formatWhen, escapeRegex };

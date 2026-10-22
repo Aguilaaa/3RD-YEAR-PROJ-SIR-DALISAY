@@ -1,26 +1,36 @@
 # MotoTech
 
-Motorcycle parts and accessories shop for ITCP318. The storefront uses React, Bootstrap, and custom CSS. The admin area uses Material UI. The API uses Express and MongoDB. Photos go to Cloudinary, login uses Firebase Authentication, and order updates send an email with a PDF receipt.
+Motorcycle parts and accessories shop for ITCP318. Layout matches the class repo: `backend` for the API and `frontend` for the React app.
 
-The project follows the class layout: `backend` for the API and `frontend` for the React app.
+The storefront uses React, Bootstrap, and custom CSS. The admin area uses Material UI. The API uses Express and MongoDB. Photos go to Cloudinary, login uses Firebase Authentication, and order updates send an email with a PDF receipt.
 
 ## Run it
 
-1. Install [MongoDB Community](https://www.mongodb.com/try/download/community) or use an Atlas connection string.
-2. Copy `backend/config/.env.example` to `backend/config/.env` and `frontend/.env.example` to `frontend/.env`.
+Use two terminals, same as [the class project](https://github.com/m3lfx/itcp318-s3a-2026).
+
+1. Copy `backend/config/.env.example` to `backend/config/.env`.
+2. Copy `frontend/.env.example` to `frontend/.env`.
 3. Fill in MongoDB, Cloudinary, Firebase, and SMTP values. Set `ADMIN_EMAIL` to the email you will register as the administrator.
-4. From this folder:
+
+**API**
 
 ```bash
+cd backend
 npm install
-npm install --prefix backend
-npm install --prefix frontend
+npm run dev
+```
+
+**Shop**
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
 The shop opens at http://localhost:5173 and the API at http://localhost:5000.
 
-Register the admin email with username and password. That account becomes an admin. You can also promote any existing account:
+Register the admin email with username and password. That account becomes an admin. You can also promote any existing account from `backend`:
 
 ```bash
 npm run make-admin -- you@email.com

@@ -12,13 +12,10 @@ const asyncHandler = require('../utils/asyncHandler');
 const { hasErrors, validateProduct } = require('../utils/validators');
 const { uploadBuffer, destroyImage } = require('../config/cloudinary');
 const { PRICE_FILTERS } = require('../constants');
+const { escapeRegex } = require('../utils/format');
 
 const MAX_IMAGES = 8;
 const NOT_DELETED = { $nor: [{ deletedAt: { $type: 'date' } }] };
-
-function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 function isDeleted(product) {
   return Boolean(product?.deletedAt);

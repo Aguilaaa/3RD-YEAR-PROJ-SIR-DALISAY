@@ -4,10 +4,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { hasErrors, validateProfile, validateAdminUser } = require('../utils/validators');
 const { uploadBuffer, destroyImage } = require('../config/cloudinary');
 const { getFirebase } = require('../config/firebase');
-
-function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+const { escapeRegex } = require('../utils/format');
 
 const updateProfile = asyncHandler(async (req, res) => {
   const { errors, value } = validateProfile(req.body, { usernameRequired: true });
