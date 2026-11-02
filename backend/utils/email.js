@@ -1,13 +1,22 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const { peso, formatWhen } = require('./format');
 const { buildReceiptPdf } = require('./pdf');
 
-function emailConfigured() {
+function resendConfigured() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
+function smtpConfigured() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
+function emailConfigured() {
+  return resendConfigured() || smtpConfigured();
+}
+
 function createTransport() {
-  if (!emailConfigured()) return null;
+  if (!smtpConfigured()) return null;
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
@@ -33,14 +42,7 @@ function itemRows(items) {
     .join('');
 }
 
-async function sendOrderEmail(order, items, kind) {
-  const transport = createTransport();
-  if (!transport) {
-    const reason = 'Email is not configured. Add SMTP settings to the server environment.';
-    console.error('Order email skipped:', reason);
-    return { sent: false, error: reason };
-  }
-
+function buildMessage(order, items, kind) {
   const placed = kind === 'placed';
   const heading = placed ? 'Thank you for your order' : `Your order is now ${order.status}`;
   const intro = placed
@@ -50,9 +52,7 @@ async function sendOrderEmail(order, items, kind) {
     ? `MotoTech order ${order.orderNumber} receipt`
     : `MotoTech order ${order.orderNumber} is ${order.status}`;
 
-  try {
-    const pdf = await buildReceiptPdf(order, items);
-    const html = `
+  const html = `
       <div style="font-family:Arial,sans-serif;color:#12151a;max-width:640px;">
         <div style="background:#12151a;color:#f6f3ee;padding:20px 24px;">
           <div style="color:#ff5a1f;font-size:22px;font-weight:700;letter-spacing:1px;">MOTOTECH</div>
@@ -83,19 +83,79 @@ async function sendOrderEmail(order, items, kind) {
         </div>
       </div>`;
 
-    await transport.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  return { subject, html };
+}
+
+async function sendWithResend({ from, to, subject, html, pdf, filename }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { data, error } = await resend.emails.send({
+    from,
+    to: [to],
+    subject,
+    html,
+    attachments: [
+      {
+        filename,
+        content: pdf.toString('base64'),
+      },
+    ],
+  });
+
+  if (error) {
+    throw new Error(error.message || 'Resend rejected the email.');
+  }
+
+  return data;
+}
+
+async function sendWithSmtp({ from, to, subject, html, pdf, filename }) {
+  const transport = createTransport();
+  if (!transport) {
+    throw new Error('SMTP is not configured.');
+  }
+
+  await transport.sendMail({
+    from,
+    to,
+    subject,
+    html,
+    attachments: [
+      {
+        filename,
+        content: pdf,
+        contentType: 'application/pdf',
+      },
+    ],
+  });
+}
+
+async function sendOrderEmail(order, items, kind) {
+  if (!emailConfigured()) {
+    const reason = 'Email is not configured. Add RESEND_API_KEY (recommended on Render) or SMTP settings.';
+    console.error('Order email skipped:', reason);
+    return { sent: false, error: reason };
+  }
+
+  const { subject, html } = buildMessage(order, items, kind);
+  const from = process.env.RESEND_FROM || process.env.SMTP_FROM || 'MotoTech <onboarding@resend.dev>';
+  const filename = `${order.orderNumber}-receipt.pdf`;
+
+  try {
+    const pdf = await buildReceiptPdf(order, items);
+    const payload = {
+      from,
       to: order.customerEmail,
       subject,
       html,
-      attachments: [
-        {
-          filename: `${order.orderNumber}-receipt.pdf`,
-          content: pdf,
-          contentType: 'application/pdf',
-        },
-      ],
-    });
+      pdf,
+      filename,
+    };
+
+    if (resendConfigured()) {
+      await sendWithResend(payload);
+    } else {
+      await sendWithSmtp(payload);
+    }
 
     return { sent: true, error: '' };
   } catch (error) {
