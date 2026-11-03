@@ -42,9 +42,6 @@ export function StoreLayout() {
   return (
     <div className="store-shell">
       <header className="site-header">
-        <div className="announce-bar">
-          OEM &amp; AFTERMARKET CFMOTO PARTS · SHIPPED FROM MANILA · SHIPS TO US · CANADA · AU · NZ · UK &amp; EUROPE
-        </div>
         <nav className="navbar navbar-expand-xl navbar-dark shop-nav">
           <div className="container-fluid shop-nav-inner">
             <Link className="brand-mark" to="/">MOTOTECH</Link>

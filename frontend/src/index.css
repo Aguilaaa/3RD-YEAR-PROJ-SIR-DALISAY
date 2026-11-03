@@ -167,14 +167,6 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 .site-header { position: sticky; top: 0; z-index: 20; background: #0a0a0a; }
-.announce-bar {
-  background: #070707;
-  color: #b7a48a;
-  text-align: center;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  padding: 0.45rem 1rem;
-}
 .shop-nav { background: #0a0a0a; border-bottom: 1px solid #1c1c1c; }
 .shop-nav-inner { gap: 1rem; padding: 0.7rem 1.5rem; align-items: center; }
 .brand-mark {
