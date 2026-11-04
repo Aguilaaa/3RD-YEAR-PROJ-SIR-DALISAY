@@ -238,6 +238,12 @@ const updateStatus = asyncHandler(async (req, res) => {
 
   const previous = order.status;
   const next = req.body.status;
+
+  // Completed is final — cannot cancel or move to any other status.
+  if (previous === 'Completed') {
+    throw new AppError('A completed order cannot be changed or cancelled.', 400);
+  }
+
   if (next === 'Cancelled' && previous !== 'Cancelled') await restoreStock(order._id);
   if (previous === 'Cancelled' && next !== 'Cancelled') await deductStock(order._id);
 

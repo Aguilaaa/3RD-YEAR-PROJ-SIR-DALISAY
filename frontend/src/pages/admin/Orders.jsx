@@ -67,7 +67,22 @@ export function AdminOrders() {
               <TableCell>{order.status}</TableCell>
               <TableCell>{peso(order.grandTotal)}</TableCell>
               <TableCell>
-                <Button onClick={() => setPending({ id: order.id, status: order.status, number: order.orderNumber })}>Update status</Button>
+                {order.status === 'Completed' ? (
+                  <Typography variant="body2" color="text.secondary">Locked</Typography>
+                ) : (
+                  <Button
+                    onClick={() =>
+                      setPending({
+                        id: order.id,
+                        status: order.status,
+                        currentStatus: order.status,
+                        number: order.orderNumber,
+                      })
+                    }
+                  >
+                    Update status
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -84,10 +99,18 @@ export function AdminOrders() {
             value={pending?.status || ''}
             onChange={(event) => setPending((current) => ({ ...current, status: event.target.value }))}
           >
-            {ORDER_STATUSES.map((status) => <MenuItem key={status} value={status}>{status}</MenuItem>)}
+            {ORDER_STATUSES.filter((status) => {
+              // Completed orders stay completed (button is already hidden).
+              // From any active status, still allow Completed; Cancelled stays available until then.
+              if (pending?.currentStatus === 'Completed') return status === 'Completed';
+              return true;
+            }).map((status) => (
+              <MenuItem key={status} value={status}>{status}</MenuItem>
+            ))}
           </TextField>
           <Typography sx={{ mt: 2 }}>
             The customer will be emailed the updated order, with each product, quantity, unit price, subtotal, grand total, and a PDF receipt.
+            Completed orders cannot be cancelled afterward.
           </Typography>
         </DialogContent>
         <DialogActions>
