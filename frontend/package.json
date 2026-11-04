@@ -15,6 +15,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "@reduxjs/toolkit": "^2.14.0",
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
@@ -28,6 +29,7 @@
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.63.0",
+    "react-redux": "^9.3.1",
     "react-router-dom": "^7.9.1",
     "yup": "^1.7.0"
   },

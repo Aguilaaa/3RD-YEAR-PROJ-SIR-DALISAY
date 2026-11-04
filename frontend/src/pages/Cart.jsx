@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api, { apiError } from '../api/client';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../store/hooks';
 import { peso } from '../utils/format';
 
 export function Cart() {

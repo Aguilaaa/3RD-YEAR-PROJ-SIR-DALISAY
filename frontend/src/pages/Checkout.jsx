@@ -3,8 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import api, { apiError, apiFieldErrors } from '../api/client';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
+import { useAuth, useCart } from '../store/hooks';
 import { peso } from '../utils/format';
 import { checkoutSchema } from '../validation/schemas';
 

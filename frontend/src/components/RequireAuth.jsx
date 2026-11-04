@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../store/hooks';
 
 export function RequireAuth({ admin = false, children }) {
   const { user, loading } = useAuth();

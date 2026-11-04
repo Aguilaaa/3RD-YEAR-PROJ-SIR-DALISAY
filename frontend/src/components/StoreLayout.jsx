@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import api from '../api/client';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
+import { useAuth, useCart } from '../store/hooks';
 import { MAIN_NAV, MORE_NAV } from '../storefront';
 
 export function StoreLayout() {
